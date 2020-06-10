@@ -1,6 +1,6 @@
 ---
 title: "Leveraging Camera Data from Multiple Projects"
-subtitle: "&#x1F4F7;"  
+subtitle: "&#x1F4F7;<br>*For Improved Precision*"  
 author: 
   - "Marcus Becker"
   - "David Huggard"
@@ -16,12 +16,14 @@ output:
     includes:
       after_body: insert-logo.html
 ---
+class: center, middle
 
 ```{r setup, include=FALSE}
 
 # options(htmltools.dir.version = FALSE)
 
 library(xaringanthemer)
+library(here)
 
 style_duo_accent(
   primary_color = "#2D415B",
@@ -32,77 +34,249 @@ style_duo_accent(
 )
 
 ```
----
-class: center, middle
 
 # Monitoring Mammals
 
 ---
 
-### The ABMI uses a version of the REST model to estimate animal density from camera traps
+## Outline
 
-REST = <ins>**R**</ins>andom <ins>**E**</ins>ncounter <ins>**S**</ins>taying <ins>**T**</ins>ime
+1. [Estimating Density](#density)
 
-Central Tenets:
+1. [Example Study Area](#area)
 
-+ Images taken at discrete intervals are turned into a record of continuous time
+1. [Those CIs are pretty wide ...](#CI)
 
-+ A zone of detection (*Effective Detection Distance*) for each camera / habitat / species combination is defined
+1. [Could we find more data?](#moar)
 
-+ Density = 
-
-Notable literature:
-+ Nakashima et al (2018)
-+ Rowcliffe et al (2008)
-
-ABMI report: [Animal Density with Cameras](www.abmi.ca)
-
-Code base: 
-
----
-## We need a lot of data!
-
-- In order to make inferences about a larger area, cameras are placed across the landscape in a random systematic manner
-
-- Because of this, the data we collect has frightful distributions
-
-- More data is better, as we can improve the precision of our density estimates for an area of interest
+1. [Improved precision!](#precision)
 
 ---
 class: center, middle
+name: density
+
+# Estimating Density
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+REST = <ins>**R**</ins>andom <ins>**E**</ins>ncounter <ins>**S**</ins>taying <ins>**T**</ins>ime
+
+--
+
+### Central Tenets:
+
+1. **Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.** 
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+.pull-left[
+<img src="moose1.gif" height=300 width=500>
+]
+
+.pull-right[
+<img src="plot1.gif" height=265 width=300>
+]
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. **Unlike quadrats, cameras do survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.**
+
+--
+
+<div align="center">
+<img src="fov.PNG" height=150>
+</div>
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. Unlike quadrats, cameras do survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.
+
+<br>
+
+$$Density = \frac{\sum(N~*~T_f)}{A_f~*~T_0}$$
+---
+
+## Oops, a small snag
+
++ One of the ABMI's primary objectives is to report on (species abundance) **trend** over time.
+
+--
+
++ In order to make inferences about the density of a species in an area of interest, cameras are placed in a random systematic manner so that they are **surveying a representative sample** of the larger area.
+
+--
+
++ However, **cameras sample a tiny area** relative to regions we're often interested in. Because of this, sampling distributions are often ... extremely skewed.  
+
+--
+
++ **More camera traps** (and/or longer sampling times) would improve the precision of density estimates for an area of interest.
+
+---
+
+### Resources
+
+--
+
+ABMI report:
+
+[Animal Density from Camera Data](https://abmi.ca/home/publications/501-550/516)
+
+--
+
+Code base:
+
+[github.com/ABbiodiversity/mammals-camera](https://github.com/ABbiodiversity/mammals-camera)
+
+--
+
+Notable literature:
+
++ Rowcliffe et al (2008)
+  - *Estimating Animal Density Using Camera Traps Without the Need for Individual Recognition*
+
++ Nakashima et al (2018) 
+  - *Estimating Animal Density Without Individual Recognition Using Information Exclusively Derived From Camera Traps*
+
+---
+class: center, middle
+name: area
 
 # An Example Area
 
 ---
 
-# Wildlife Management Units (WMUs)
+### Wildlife Management Units (WMUs)
 
 Here is a map of them in Alberta:
 
-```{r eval=FALSE, tidy=FALSE}
+--
+
+.pull-right[
+```{r eval=TRUE, echo=FALSE, include=TRUE, fig.height=9}
 
 library(sf)
 library(ggplot2)
-library(abmi.themes)
 
-sf_ab <- 
-sf_wmu <- 
-  
-ggplot() +
+ab_prov <- st_read(here("./data/ab_prov.shp"), quiet = TRUE, stringsAsFactors = FALSE)
+ab_wmu <- st_read(here("./data/ab_wmu.shp"), quiet = TRUE, stringsAsFactors = FALSE)
+ab_wmu_selection <- st_read(here("./data/ab_wmu_selection.shp"), quiet = TRUE, stringsAsFactors = FALSE) %>%
+  st_transform("+init=epsg:4326")
+
+ggplot(ab_prov) +
   geom_sf() +
-  geom_sf()
+  geom_sf(data = ab_wmu, color = "black") +
+  # geom_sf(data = ab_wmu_selection, color = "blue", size = 1) +
+  theme_minimal() +
+  theme(axis.text = element_blank())
 
 ```
+]
 
 ---
 
-Let's pick out a subset (yes, I'm cherry-picking to illustrate my point):
-+ WMU
-+ WMU
-+ WMU
-+ WMU
+### Wildlife Management Units (WMUs)
 
---
+Here is a map of them in Alberta:
+
+.pull-left[Let's pick out a subset:
+
++ Algar Lake (WMU 519)
++ Winefred Lake (WMU 517)
++ Crow Lake (WMU 512)
++ Heart Lake (WMU 515)
+]
+.pull-right[
+```{r eval=TRUE, echo=FALSE, include=TRUE, fig.height=9}
+
+ggplot(ab_prov) +
+  geom_sf() +
+  geom_sf(data = ab_wmu, color = "black") +
+  geom_sf(data = ab_wmu_selection, color = "red", size = 1.25) +
+  theme_minimal() +
+  theme(axis.text = element_blank())
+
+```
+]
+
+---
+class: hide-logo
+### Wildlife Management Units (WMUs)
+
+```{r eval=FALSE, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE, out.width='100%', fig.height=7}
+library(leaflet)
+library(dplyr)
+
+cam_abmi <- awesomeIcons(
+  icon = "camera",
+  iconColor = "black",
+  library = "ion",
+  markerColor = "white"
+)
+
+cam_bg <- awesomeIcons(
+  icon = "camera",
+  iconColor = "black",
+  library = "ion",
+  markerColor = "lightred"
+)
+
+cam_cmu <- awesomeIcons(
+  icon = "camera",
+  iconColor = "black",
+  library = "ion",
+  markerColor = "lightblue"
+)
+
+sf_abmi_selection <- sf_abmi %>%
+  st_transform("+init=epsg:4326") %>%
+  st_join(ab_wmu_selection, left = FALSE) %>%
+  st_jitter(0.02)
+
+sf_bg_selection <- sf_bg %>%
+  st_transform("+init=epsg:4326") %>%
+  st_join(ab_wmu_selection, left = FALSE)
+
+sf_cmu_selection <- sf_cmu %>%
+  st_transform("+init=epsg:4326") %>%
+  st_join(ab_wmu_selection, left = FALSE)
+
+map <- ab_wmu_selection %>%
+  st_transform("+init=epsg:4326") %>%
+  leaflet() %>%
+  addTiles() %>%
+  #addProviderTiles("Stamen.TerrainBackground") %>%
+  addPolylines(color = "#070707", weight = 3, smoothFactor = 0.2, opacity = 3, fill = FALSE) %>%
+  addAwesomeMarkers(data = sf_abmi_selection, icon = cam_abmi) %>%
+  addAwesomeMarkers(data = sf_bg_selection, icon = cam_bg, group = "Bayne Big Grid") %>%
+  addAwesomeMarkers(data = sf_cmu_selection, icon = cam_cmu, group = "Caribou Monitoring Unit") %>%
+  addLayersControl(overlayGroups = c("Bayne Big Grid", "Caribou Monitoring Unit"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  hideGroup(c("Bayne Big Grid", "Caribou Monitoring Unit"))
+
+htmlwidgets::saveWidget(map, file = here("./docs/map.html"), selfcontained = TRUE)
+
+```
+
+<iframe src="map.html" width="700" height="500"> </iframe>
+
+---
 
 Here's what we have for camera deployments in these four WMUs:
 

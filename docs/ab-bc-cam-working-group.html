@@ -5,23 +5,23 @@
     <meta charset="utf-8" />
     <meta name="author" content="Marcus Becker" />
     <meta name="author" content="David Huggard" />
-    <meta name="date" content="2020-06-09" />
-    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
-    <script src="libs/jquery/jquery.min.js"></script>
-    <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
-    <script src="libs/leaflet/leaflet.js"></script>
-    <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
-    <script src="libs/Proj4Leaflet/proj4-compressed.js"></script>
-    <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
-    <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
-    <script src="libs/leaflet-binding/leaflet.js"></script>
-    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
-    <script src="libs/datatables-binding/datatables.js"></script>
-    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
-    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
-    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
-    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <meta name="date" content="2020-06-10" />
+    <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="libs/jquery-1.12.4/jquery.min.js"></script>
+    <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-1.3.1/leaflet.js"></script>
+    <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding-2.0.3/leaflet.js"></script>
+    <link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding-0.13/datatables.js"></script>
+    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -29,85 +29,180 @@
 class: center, middle, inverse, title-slide
 
 # Leveraging Camera Data from Multiple Projects
-## 📷
+## 📷<br><em>For Improved Precision</em>
 ### Marcus Becker
 ### David Huggard
-### 2020-06-09
+### 2020-06-10
 
 ---
 
-
-
----
 class: center, middle
+
+
 
 # Monitoring Mammals
 
 ---
 
-### The ABMI uses a version of the REST model to estimate animal density from camera traps
+## Outline
 
-REST = &lt;ins&gt;**R**&lt;/ins&gt;andom &lt;ins&gt;**E**&lt;/ins&gt;ncounter &lt;ins&gt;**S**&lt;/ins&gt;taying &lt;ins&gt;**T**&lt;/ins&gt;ime
+1. [Estimating Density](#density)
 
-Central Tenets:
+1. [Example Study Area](#area)
 
-+ Images taken at discrete intervals are turned into a record of continuous time
+1. [Those CIs are pretty wide ...](#CI)
 
-+ A zone of detection (*Effective Detection Distance*) for each camera / habitat / species combination is defined
+1. [Could we find more data?](#moar)
 
-+ Density = 
-
-Notable literature:
-+ Nakashima et al (2018)
-+ Rowcliffe et al (2008)
-
-ABMI report: [Animal Density with Cameras](www.abmi.ca)
-
-Code base: 
-
----
-## We need a lot of data!
-
-- In order to make inferences about a larger area, cameras are placed across the landscape in a random systematic manner
-
-- Because of this, the data we collect has frightful distributions
-
-- More data is better, as we can improve the precision of our density estimates for an area of interest
+1. [Improved precision!](#precision)
 
 ---
 class: center, middle
+name: density
+
+# Estimating Density
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+REST = &lt;ins&gt;**R**&lt;/ins&gt;andom &lt;ins&gt;**E**&lt;/ins&gt;ncounter &lt;ins&gt;**S**&lt;/ins&gt;taying &lt;ins&gt;**T**&lt;/ins&gt;ime
+
+--
+
+### Central Tenets:
+
+1. **Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.** 
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+.pull-left[
+&lt;img src="moose1.gif" height=300 width=500&gt;
+]
+
+.pull-right[
+&lt;img src="plot1.gif" height=265 width=300&gt;
+]
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. **Unlike quadrats, cameras do survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.**
+
+--
+
+&lt;div align="center"&gt;
+&lt;img src="fov.PNG" height=150&gt;
+&lt;/div&gt;
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. Unlike quadrats, cameras do survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.
+
+&lt;br&gt;
+
+`$$Density = \frac{\sum(N~*~T_f)}{A_f~*~T_0}$$`
+---
+
+## Oops, a small snag
+
++ One of the ABMI's primary objectives is to report on (species abundance) **trend** over time.
+
+--
+
++ In order to make inferences about the density of a species in an area of interest, cameras are placed in a random systematic manner so that they are **surveying a representative sample** of the larger area.
+
+--
+
++ However, **cameras sample a tiny area** relative to regions we're often interested in. Because of this, sampling distributions are often ... extremely skewed.  
+
+--
+
++ **More camera traps** (and/or longer sampling times) would improve the precision of density estimates for an area of interest.
+
+---
+
+### Resources
+
+--
+
+ABMI report:
+
+[Animal Density from Camera Data](https://abmi.ca/home/publications/501-550/516)
+
+--
+
+Code base:
+
+[github.com/ABbiodiversity/mammals-camera](https://github.com/ABbiodiversity/mammals-camera)
+
+--
+
+Notable literature:
+
++ Rowcliffe et al (2008)
+  - *Estimating Animal Density Using Camera Traps Without the Need for Individual Recognition*
+
++ Nakashima et al (2018) 
+  - *Estimating Animal Density Without Individual Recognition Using Information Exclusively Derived From Camera Traps*
+
+---
+class: center, middle
+name: area
 
 # An Example Area
 
 ---
 
-# Wildlife Management Units (WMUs)
+### Wildlife Management Units (WMUs)
 
 Here is a map of them in Alberta:
 
+--
 
-```r
-library(sf)
-library(ggplot2)
-library(abmi.themes)
-
-sf_ab &lt;- 
-sf_wmu &lt;- 
-  
-ggplot() +
-  geom_sf() +
-  geom_sf()
-```
+.pull-right[
+![](ab-bc-cam-working-group_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
 
 ---
 
-Let's pick out a subset (yes, I'm cherry-picking to illustrate my point):
-+ WMU
-+ WMU
-+ WMU
-+ WMU
+### Wildlife Management Units (WMUs)
 
---
+Here is a map of them in Alberta:
+
+.pull-left[Let's pick out a subset:
+
++ Algar Lake (WMU 519)
++ Winefred Lake (WMU 517)
++ Crow Lake (WMU 512)
++ Heart Lake (WMU 515)
+]
+.pull-right[
+![](ab-bc-cam-working-group_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+]
+
+---
+class: hide-logo
+### Wildlife Management Units (WMUs)
+
+
+
+&lt;iframe src="map.html" width="700" height="500"&gt; &lt;/iframe&gt;
+
+---
 
 Here's what we have for camera deployments in these four WMUs:
 
@@ -388,8 +483,8 @@ library(leaflet)
 leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
 ```
 
-<div id="htmlwidget-20ed0727ef20770dc379" style="width:100%;height:432px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-20ed0727ef20770dc379">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e60df8d0dae1b63c2c13" style="width:100%;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e60df8d0dae1b63c2c13">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -401,8 +496,8 @@ DT::datatable(
 )
 ```
 
-<div id="htmlwidget-21d61ef88ccc248255ee" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-21d61ef88ccc248255ee">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6ef2172afb33cbf2fbd9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6ef2172afb33cbf2fbd9">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
