@@ -25,6 +25,11 @@ class: center, middle
 library(xaringanthemer)
 library(here)
 library(abmi.themes)
+library(dplyr)
+library(stringr)
+library(sf)
+library(abmi.camera.extras)
+library(ggplot2)
 
 style_duo_accent(
   primary_color = "#2D415B",
@@ -172,10 +177,6 @@ Here is a map of them in Alberta:
 
 .pull-right[
 ```{r eval=TRUE, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, fig.height=9}
-
-library(sf)
-library(ggplot2)
-
 ab_prov <- st_read(here("./data/ab_prov.shp"), quiet = TRUE, stringsAsFactors = FALSE)
 ab_wmu <- st_read(here("./data/ab_wmu.shp"), quiet = TRUE, stringsAsFactors = FALSE)
 ab_wmu_selection <- st_read(here("./data/ab_wmu_selection.shp"), quiet = TRUE, stringsAsFactors = FALSE) %>%
@@ -187,7 +188,6 @@ ggplot(ab_prov) +
   # geom_sf(data = ab_wmu_selection, color = "blue", size = 1) +
   theme_minimal() +
   theme(axis.text = element_blank())
-
 ```
 ]
 
@@ -206,14 +206,12 @@ Here is a map of them in Alberta:
 ]
 .pull-right[
 ```{r eval=TRUE, echo=FALSE, include=TRUE, warning=FALSE, message=FALSE, fig.height=9}
-
 ggplot(ab_prov) +
   geom_sf() +
   geom_sf(data = ab_wmu, color = "black") +
   geom_sf(data = ab_wmu_selection, color = "red", size = 1.25) +
   theme_minimal() +
   theme(axis.text = element_blank())
-
 ```
 ]
 
@@ -221,61 +219,67 @@ ggplot(ab_prov) +
 class: hide-logo
 ### Where are ABMI cameras? (...ish)
 
-```{r eval=FALSE, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE, out.width='100%', fig.height=7}
-library(leaflet)
-library(leaflet.extras)
-library(dplyr)
+```{r eval=TRUE, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE, out.width='100%', fig.height=7}
+#library(leaflet)
+#library(leaflet.extras)
 
-cam_abmi <- awesomeIcons(
-  icon = "camera",
-  iconColor = "black",
-  library = "ion",
-  markerColor = "white"
-)
+#cam_abmi <- awesomeIcons(
+#  icon = "camera",
+#  iconColor = "black",
+#  library = "ion",
+#  markerColor = "white"
+#)
 
-cam_bg <- awesomeIcons(
-  icon = "camera",
-  iconColor = "black",
-  library = "ion",
-  markerColor = "lightred"
-)
+#cam_bg <- awesomeIcons(
+#  icon = "camera",
+#  iconColor = "black",
+#  library = "ion",
+#  markerColor = "lightred"
+#)
 
-cam_cmu <- awesomeIcons(
-  icon = "camera",
-  iconColor = "black",
-  library = "ion",
-  markerColor = "lightblue"
-)
+#cam_cmu <- awesomeIcons(
+#  icon = "camera",
+#  iconColor = "black",
+#  library = "ion",
+#  markerColor = "lightblue"
+#)
+
+sf_abmi <- st_read(here("./data/abmi_dep1.shp"), quiet = TRUE, stringsAsFactors = FALSE)
+sf_bg <- st_read(here("./data/bg_dep.shp"), quiet = TRUE, stringsAsFactors = FALSE)
+sf_cmu <- st_read(here("./data/cmu_dep.shp"), quiet = TRUE, stringsAsFactors = FALSE)
 
 sf_abmi_selection <- sf_abmi %>%
   st_transform("+init=epsg:4326") %>%
   st_join(ab_wmu_selection, left = FALSE) %>%
-  st_jitter(0.02)
+  st_jitter(0.02) %>%
+  st_set_geometry(NULL)
 
 sf_bg_selection <- sf_bg %>%
   st_transform("+init=epsg:4326") %>%
-  st_join(ab_wmu_selection, left = FALSE)
+  st_join(ab_wmu_selection, left = FALSE) %>%
+  st_set_geometry(NULL)
 
 sf_cmu_selection <- sf_cmu %>%
   st_transform("+init=epsg:4326") %>%
-  st_join(ab_wmu_selection, left = FALSE)
+  st_join(ab_wmu_selection, left = FALSE) %>%
+  st_set_geometry(NULL)
 
-map <- ab_wmu_selection %>%
-  st_transform("+init=epsg:4326") %>%
-  leaflet() %>%
-  addTiles() %>%
-  addProviderTiles("Stamen.TerrainBackground") %>%
-  addFullscreenControl() %>%
-  addScaleBar(position = "bottomright", options = scaleBarOptions(imperial = FALSE)) %>%
-  addPolylines(color = "#070707", weight = 3, smoothFactor = 0.2, opacity = 3, fill = FALSE) %>%
-  addAwesomeMarkers(data = sf_abmi_selection, icon = cam_abmi, group = "ABMI Grid") %>%
-  addAwesomeMarkers(data = sf_bg_selection, icon = cam_bg, group = "Bayne Big Grid") %>%
-  addAwesomeMarkers(data = sf_cmu_selection, icon = cam_cmu, group = "Caribou Monitoring Unit") %>%
-  addLayersControl(overlayGroups = c("ABMI Grid", "Bayne Big Grid", "Caribou Monitoring Unit"),
-                   options = layersControlOptions(collapsed = TRUE)) %>%
-  hideGroup(c("Bayne Big Grid", "Caribou Monitoring Unit"))
+#map <- ab_wmu_selection %>%
+#  st_transform("+init=epsg:4326") %>%
+#  leaflet() %>%
+#  addTiles() %>%
+#  addProviderTiles("Stamen.TerrainBackground") %>%
+#  addFullscreenControl() %>%
+#  addScaleBar(position = "bottomright", options = scaleBarOptions(imperial = FALSE)) %>%
+#  addPolylines(color = "#070707", weight = 3, smoothFactor = 0.2, opacity = 3, fill = FALSE) %>%
+#  addAwesomeMarkers(data = sf_abmi_selection, icon = cam_abmi, group = "ABMI Grid") %>%
+#  addAwesomeMarkers(data = sf_bg_selection, icon = cam_bg, group = "Bayne Big Grid") %>%
+#  addAwesomeMarkers(data = sf_cmu_selection, icon = cam_cmu, group = "Caribou Monitoring Unit") %>%
+#  addLayersControl(overlayGroups = c("ABMI Grid", "Bayne Big Grid", "Caribou Monitoring Unit"),
+#                   options = layersControlOptions(collapsed = TRUE)) %>%
+#  hideGroup(c("Bayne Big Grid", "Caribou Monitoring Unit"))
 
-htmlwidgets::saveWidget(map, file = here("./docs/map1.html"), selfcontained = TRUE)
+#htmlwidgets::saveWidget(map, file = here("./docs/map1.html"), selfcontained = TRUE)
 
 ```
 
@@ -287,8 +291,6 @@ htmlwidgets::saveWidget(map, file = here("./docs/map1.html"), selfcontained = TR
 
 .left-code[
 ```{r eval=TRUE, warning=FALSE, message=FALSE}
-library(abmi.camera.extras)
-
 cameras <- ace_get_cam(
   aoi = ab_wmu_selection,
   group_id = WMUNIT_NAM,
@@ -302,7 +304,6 @@ density <- ace_join_dens(
 ]
 
 ```{r plot, fig.show="hide", warning=FALSE, message=FALSE, echo=FALSE, eval=TRUE, fig.showtext=TRUE}
-
 ggplot(data = density, aes(x = density, fill = common_name)) +
   geom_histogram(bins = 15) +
   coord_cartesian(ylim = c(0, 30)) +
@@ -313,7 +314,6 @@ ggplot(data = density, aes(x = density, fill = common_name)) +
        title = "Distribution of density at\nindividual deployments.") +
   theme_abmi() +
   theme(legend.position = "none")
-
 ```
 
 .right-plot[
@@ -336,7 +336,6 @@ summary <-
 ]
 
 ```{r plot1, fig.show="hide", warning=FALSE, message=FALSE, echo=FALSE, eval=TRUE, fig.showtext=TRUE}
-
 ggplot(data = summary, aes(x = WMUNIT_NAM, y = density_avg,
                            ymin = density_lci_0.9, ymax = density_uci_0.9,
                            color = common_name)) +
@@ -352,8 +351,6 @@ ggplot(data = summary, aes(x = WMUNIT_NAM, y = density_avg,
   theme(panel.grid.major = element_blank(),
         legend.position = "none",
         strip.text = element_text(size = 14))
-  
-
 ```
 
 .right-plot[
@@ -390,10 +387,9 @@ We can incorporate the REST-derived density estimates from other camera projects
 
 --
 
-```{r echo=FALSE, fig.height=5.5, fig.width=7, fig.showtext=TRUE}
-library(stringr)
-
+```{r echo=FALSE, fig.height=5.5, fig.width=7, fig.showtext=TRUE, warning=FALSE, message=FALSE}
 all_dep <- bind_rows(sf_abmi_selection, sf_bg_selection, sf_cmu_selection) %>%
+  rename(Deployment = Dplymnt) %>%
   mutate(project = case_when(
     str_detect(Deployment, "ABMI") ~ "ABMI",
     str_detect(Deployment, "BG") ~ "Big Grid",
@@ -413,7 +409,6 @@ all_dep %>%
   scale_fill_manual(values = pal1) +
   labs(y = "", x = "") +
   theme_abmi()
-
 ```
 
 ---
@@ -423,7 +418,6 @@ class: hide-logo
 We can incorporate the REST-derived density estimates from other camera projects as long as they were placed on the landscape in a **random (or systematic-random) sampling design**.
 
 ```{r echo=FALSE, fig.height=5.5, fig.width=7, fig.showtext=TRUE}
-
 all_dep %>%
   filter(!Project == "CMU") %>%
   ggplot(aes(x = WMUNIT_NAM, fill = Project)) +
@@ -432,7 +426,6 @@ all_dep %>%
   scale_fill_manual(values = pal2) +
   labs(y = "", x = "") +
   theme_abmi()
-
 ```
 
 ---
@@ -442,7 +435,6 @@ class: hide-logo
 We can incorporate the REST-derived density estimates from other camera projects as long as they were placed on the landscape in a **random (or systematic-random) sampling design**.
 
 ```{r echo=FALSE, fig.height=5.5, fig.width=7, fig.showtext=TRUE}
-
 all_dep %>%
   ggplot(aes(x = WMUNIT_NAM, fill = Project)) +
   geom_bar(color = "black") +
@@ -450,7 +442,6 @@ all_dep %>%
   scale_fill_manual(values = pal3) +
   labs(y = "", x = "") +
   theme_abmi()
-
 ```
 
 ---
@@ -469,7 +460,23 @@ name: precision
 
 ### Takeaways
 
-1. Camera deployments from alternative projects (with different research objectives) can be used 
+1. Camera deployments from different projects (with different research objectives) can sometimes be used for a common goal
+
+  - In this case, to contribute to a joint regional density estimation.
+
+2. However, in this case, these projects must share the similar methodological underpinnings with respect to sampling strategy
+
+---
+
+### Questions?
+
+<br>
+
+### Feel free to email me: [mabecker@ualberta.ca](mabecker@ualberta.ca)
+
+<br>
+
+### Thanks!
 
 
 
