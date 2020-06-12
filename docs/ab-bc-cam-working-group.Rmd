@@ -169,7 +169,7 @@ Here is a map of them in Alberta:
 --
 
 .pull-right[
-```{r eval=TRUE, echo=FALSE, include=TRUE, fig.height=9}
+```{r eval=TRUE, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, fig.height=9}
 
 library(sf)
 library(ggplot2)
