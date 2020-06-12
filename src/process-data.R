@@ -80,7 +80,80 @@ sf_cmu <- st_as_sf(cmu, coords = c("Public_Long", "Public_Lat"), crs = 4326)
 
 st_write(sf_cmu, "./data/cmu_dep.shp")
 
+#-------------------------------------------------------------------------------
 
+# Density
+
+bg_density <- read_csv("G:/Shared drives/ABMI Camera Mammals/results/density/Marcus/all-density_2020-04-25.csv") %>%
+  filter(str_detect(DeploymentYear, "BG"))
+
+bg_deps <- sf_bg_selection %>%
+  st_set_geometry(NULL) %>%
+  select(deployment = Deployment, WMUNIT_NAM)
+
+cmu_deps <- sf_cmu_selection %>%
+  st_set_geometry(NULL) %>%
+  select(deployment = Deployment, WMUNIT_NAM) %>%
+  mutate(deployment = paste0("CMU", deployment))
+
+bg_density_1 <- bg_density %>%
+  filter(common_name == "Moose" | common_name == "Black Bear",
+         seasonal > 20) %>%
+  separate(DeploymentYear, into = c("deployment", "year"), sep = "_") %>%
+  mutate(cpue_km2 = ifelse(cpue_km2 == "NaN", 0, cpue_km2)) %>%
+  filter(cpue_km2 != Inf, !is.na(cpue_km2)) %>%
+  group_by(deployment, common_name) %>%
+  summarise(density = mean(cpue_km2)) %>%
+  left_join(bg_deps, by = "deployment") %>%
+  filter(!is.na(WMUNIT_NAM))
+
+cmu_density <- read_csv("G:/Shared drives/ABMI Camera Mammals/results/density/Marcus/cmu-all-density_2020-04-17.csv")
+
+cmu_density_1 <- cmu_density %>%
+  filter(common_name == "Moose" | common_name == "Black Bear",
+         seasonal > 20) %>%
+  group_by(deployment, common_name) %>%
+  summarise(density = mean(cpue_km2)) %>%
+  filter(!is.na(density)) %>%
+  mutate(deployment = str_remove_all(deployment, "-")) %>%
+  left_join(cmu_deps, by = "deployment") %>%
+  filter(!is.na(WMUNIT_NAM))
+
+all <- density %>%
+  st_set_geometry(NULL) %>%
+  select(deployment, common_name, WMUNIT_NAM, density) %>%
+  bind_rows(bg_density_1, cmu_density_1)
+
+all_summary <- ace_summarise_dens(x = all,
+                                 group_id = WMUNIT_NAM,
+                                 agg_samp_per = TRUE,
+                                 conflevel = 0.9) %>%
+  mutate(projects = "ABMI, BG, and CMU")
+
+summary <- summary %>%
+  mutate(projects = "ABMI")
+
+everything <- bind_rows(all_summary, summary)
+
+ggplot(data = everything, aes(x = WMUNIT_NAM, y = density_avg,
+                              ymin = density_lci_0.9, ymax = density_uci_0.9,
+                              color = common_name)) +
+  geom_errorbar(width = 0.3, size = 1.25) +
+  geom_point(size = 4) +
+  coord_flip() +
+  facet_wrap(~ common_name, nrow = 2) +
+  scale_color_abmi(palette = "main") +
+  labs(x = "", y = expression(Density~(individuals~per~km^2)),
+       title = "Cameras from: {closest_state}",
+       subtitle = "Estimated density with 90% CI") +
+  theme_abmi() +
+  theme(panel.grid.major = element_blank(),
+        legend.position = "none",
+        strip.text = element_text(size = 13),
+        plot.title = element_text(size = 16)) +
+  transition_states(projects)
+
+anim_save("./docs/plot2.gif")
 
 
 
