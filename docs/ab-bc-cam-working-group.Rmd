@@ -16,9 +16,7 @@ output:
     includes:
       after_body: insert-logo.html
 ---
-class: center, middle
-
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}
 
 # options(htmltools.dir.version = FALSE)
 
@@ -41,10 +39,6 @@ style_duo_accent(
 )
 
 ```
-
-# Monitoring Mammals
-
----
 
 ## Outline
 
@@ -147,11 +141,11 @@ Notable literature:
 
 ## Oops, a small snag
 
-+ One of the ABMI's primary objectives is to report on (species abundance) **trend** over time.
++ We want to be able to report on differences in species abundance either between areas, or over time. 
 
 --
 
-+ In order to make inferences about the density of a species in an area of interest, cameras are placed in a random systematic manner so that they are **surveying a representative sample** of the larger area.
++ In order to make inferences about density in an area of interest, cameras are placed in a random systematic manner so that they are **surveying a representative sample** of the larger area.
 
 --
 
@@ -291,6 +285,38 @@ sf_cmu_selection <- sf_cmu %>%
 
 .left-code[
 ```{r eval=TRUE, warning=FALSE, message=FALSE}
+library(abmi.camera.extras)
+
+cameras <- ace_get_cam(
+  aoi = ab_wmu_selection,
+  group_id = WMUNIT_NAM,
+  crs = 4326)
+
+density <- ace_join_dens(
+  x = cameras, 
+  species = c(
+    "Moose", "Black Bear"))
+```
+]
+
+.right-plot[
+```{r echo=FALSE, out.width="40%", fig.align="center"}
+knitr::include_graphics("bear.png")
+```
+
+```{r echo=FALSE, out.width="40%", fig.align="center"}
+knitr::include_graphics("moose.png")
+```
+]
+
+---
+
+### (Relative) Density Estimates
+
+.left-code[
+```{r eval=TRUE, warning=FALSE, message=FALSE}
+library(abmi.camera.extras)
+
 cameras <- ace_get_cam(
   aoi = ab_wmu_selection,
   group_id = WMUNIT_NAM,
@@ -375,7 +401,7 @@ name: moar
 
 ---
 class: hide-logo
-# More Cameras!
+### More Cameras!
 
 <iframe src="map1.html" width="800" height="500"> </iframe>
 
@@ -460,23 +486,25 @@ name: precision
 
 ### Takeaways
 
-1. Camera deployments from different projects (with different research objectives) can sometimes be used for a common goal
+1. Camera deployments from different projects (with different research objectives) can sometimes be used for a common goal.
 
-  - In this case, to contribute to a joint regional density estimation.
+  - In this case, to contribute to a **joint regional density estimate**.
 
-2. However, in this case, these projects must share the similar methodological underpinnings with respect to sampling strategy
+2. However, in this case, these projects must share the similar methodological underpinnings with respect to sampling strategy.
 
 ---
 
-### Questions?
+## Questions?
 
 <br>
 
-### Feel free to email me: [mabecker@ualberta.ca](mabecker@ualberta.ca)
+Feel free to email me anytime!
+
+[mabecker@ualberta.ca](mabecker@ualberta.ca)
 
 <br>
 
-### Thanks!
+## Thanks!
 
 
 
