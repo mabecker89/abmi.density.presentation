@@ -141,7 +141,7 @@ ggplot(data = everything, aes(x = WMUNIT_NAM, y = density_avg,
   geom_errorbar(width = 0.3, size = 1.25) +
   geom_point(size = 4) +
   coord_flip() +
-  facet_wrap(~ common_name, nrow = 2) +
+  facet_wrap(~ common_name, nrow = 4) +
   scale_color_abmi(palette = "main") +
   labs(x = "", y = expression(Density~(individuals~per~km^2)),
        title = "Cameras from: {closest_state}",
