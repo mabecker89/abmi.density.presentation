@@ -1,0 +1,465 @@
+---
+title: "McMurray Métis Camera Project"
+subtitle: "&#x1F4F7;<br>*Preliminary Results*"  
+author: 
+  - "Marcus Becker"
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "custom.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    includes:
+      after_body: insert-logo.html
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+
+# Load libraries
+library(xaringanthemer)
+library(here)
+library(dplyr)
+library(abmi.themes)
+library(abmi.camera.extras)
+library(ggplot2)
+library(readr)
+library(forcats)
+library(lubridate)
+
+
+# Add ABMI fonts for plotting
+add_abmi_fonts()
+
+style_duo_accent(
+  primary_color = "#2D415B",
+  secondary_color = "#A8AF8C",
+  inverse_header_color = "#FFFFFF",
+  header_font_google = google_font("Montserrat"),
+  text_font_google = google_font("Montserrat"),
+  code_font_size = "0.7rem"
+)
+
+root <- "G:/Shared drives/ABMI Camera Mammals/projects/fort-mcmurray-metis/"
+
+# Load data
+df_fmm_nimages <- read_csv(paste0(root, "data/processed/fmm_n_images_by_species_2020-10-15.csv"))
+df_fmm_nimages_trapline <- read_csv(paste0(root, "data/processed/fmm_n_images_by_species_trapline_2020-10-22.csv"))
+df_range_updated <- read_csv(paste0(root, "data/processed/range_updated.csv"))
+df_fmm_series_4 <- read_csv(paste0(root, "data/processed/fmm_series_summary.csv"))
+df_fmm_density <- read_csv(paste0(root, "data/processed/fmm_deployment_density_2020-10-15.csv"))
+df_fmm_density_trapline <- read_csv(paste0(root, "data/processed/fmm_trapline_density_2020-10-15.csv"))
+
+```
+
+## Outline
+
+1. [Summary Stats](#summary)
+
+1. [Estimating Density](#density)
+
+1. [Spatial Analysis](#spatial)
+
+1. [Further Work](#moar)
+
+---
+class: center, middle
+name: summary
+
+# Summary Stats
+
+---
+class: hide-logo
+### Where were the cameras placed?
+
+<iframe src="fmm_map1.html" width="800" height="500"> </iframe>
+
+---
+### Number of images by species
+
+```{r, fig.showtext=TRUE, echo=FALSE, warning=FALSE, message=FALSE, out.width="90%", fig.height=5, align="center", dpi=600}
+
+p1 <- df_fmm_nimages %>%
+  filter(n > 7) %>%
+  #group_by(trapline, common_name) %>%
+  #left_join(df_fmm_nimages, by = "common_name") %>%
+  mutate(common_name = fct_reorder(as.factor(common_name), n)) %>%
+  ggplot(mapping = aes(x = common_name, y = n, fill = common_name)) +
+  geom_col(color = "black") +
+  geom_text(aes(label = n, y = n + 600, alpha = 0.5), size = 3, alpha = 0.5) +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "",
+       caption = "From the 1st year of camera sampling for the McMurray Métis camera project.",
+       subtitle = "") +
+  theme_abmi() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank(),
+        plot.caption = element_text(margin = margin(15, 0, 10, 0)),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9))
+
+p1
+
+```
+
+---
+class: hide-logo
+### Number of images by species and trapline
+
+```{r, fig.showtext=TRUE, echo=FALSE, warning=FALSE, message=FALSE, out.width="90%", fig.height=5.5, align="center", dpi=600}
+
+p2 <- df_fmm_nimages_trapline %>%
+  #filter(n > 80) %>%
+  #group_by(trapline, common_name) %>%
+  left_join(df_fmm_nimages, by = "common_name") %>%
+  mutate(common_name = fct_reorder(as.factor(common_name), n)) %>%
+  ggplot(mapping = aes(x = common_name, y = n_images, fill = common_name)) +
+  geom_col(color = "black", size = 0.3) +
+  geom_text(aes(label = n_images, y = n_images + 600, alpha = 0.5), size = 2, alpha = 0.5) +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "",
+       caption = "From the 1st year of camera sampling for the McMurray Métis camera project.",
+       subtitle = "") +
+  theme_abmi() +
+  facet_wrap(~ trapline, nrow = 3) +
+  theme(legend.position = "none",
+        plot.title = element_blank(),
+        plot.subtitle = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.caption = element_text(margin = margin(15, 0, 10, 0)),
+        strip.text = element_text(size = 10, face = "bold"),
+        axis.text.y = element_text(size = 7),
+        axis.text.x = element_text(size = 8))
+
+p2
+
+```
+
+---
+class: center, middle
+name: density
+
+# Animal Density
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+--
+  
+Important components of the calculation:
+
+1. **Time in the camera field of view**.
+
+---
+### Density
+
+.pull-left[
+<img src="moose1.gif" height=300 width=500>
+]
+
+.pull-right[
+<img src="plot1.gif" height=265 width=300>
+]
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view.
+2. **Deployment operating times**
+
+---
+class: hide-logo
+### Density
+
+```{r durations, fig.showtext=TRUE, out.width="100%", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5.3, dpi=600}
+
+my_pal <- c("#2D415B", "darkred")
+winter_start <- as.POSIXct("2018-10-15")
+winter_end <- as.POSIXct("2019-04-15")
+summer_end <- as.POSIXct("2019-10-15")
+
+inter1 <- interval(winter_start, winter_end)
+inter2 <- interval(winter_end, summer_end)
+
+df_range_updated_new <- df_range_updated %>%
+  mutate(omitted = factor(ifelse(deployment == "DG-25-MM25" | deployment == "DG-11-MM11" | deployment == "DG-17-MM17" | deployment == "FL-WP112-MM41",
+         1, 0))) %>%
+  mutate(deployment = as.factor(deployment),
+         deployment = fct_reorder(deployment, earliest, .desc = TRUE)) %>%
+  arrange(earliest)
+
+p3 <- df_range_updated_new %>%
+  ggplot(mapping = aes(y = deployment)) +
+  geom_segment(mapping = aes(x = earliest, xend = latest, 
+                             y = deployment, yend = deployment, color = omitted),
+               size = 2,
+               alpha = 0.8) +
+  geom_vline(xintercept = as.numeric(winter_start), 
+             col = "black", size = 1.5, linetype = 2) +
+  geom_vline(xintercept = as.numeric(winter_end), 
+             col = "black", size = 1.5, linetype = 2) +
+  geom_vline(xintercept = as.numeric(summer_end), 
+             col = "black", size = 1.5, linetype = 2) +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%b %Y") +
+  annotate("label", 
+           x = as.POSIXct((inter1@start + as.duration(inter1) / 2) + days(15)),
+           y = 5, label = "Winter", size = 6, color = "black") +
+  annotate("label",
+           x = as.POSIXct(inter2@start + as.duration(inter2) / 2),
+           y = 5, label = "Summer", size = 6, color = "black") + 
+  labs(y = "",
+       title = "McMurray Métis camera deployment durations",
+       caption = "Deployment's removed from further analysis are represented in red.\n'DG' suffix refers to cameras in Destiny's trapline, 'FL' are Frank's, and 'LG' are in Lloyd's.") +
+  scale_color_manual(values = my_pal) +
+  #facet_wrap(~ trapline, ncol = 1) +
+  theme_abmi() +
+  theme(axis.text.y = element_text(size = 5),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_text(size = 12),
+        axis.text.x = element_text(size = 8, angle = 45, hjust = 1, margin = margin(0, 0, 10, 0)),
+        axis.title.x = element_blank(),
+        #panel.grid.major.y = element_blank(),
+        axis.line.x.bottom = element_line(linetype = 1),
+        #axis.line.y.left = element_line(linetype = 1),
+        legend.position = "none",
+        plot.title = element_text(margin = margin(0, 0, 12, 0), size = 12))
+
+p3
+  
+```
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view.
+2. Deployment operating times
+3. **Area surveyed by the camera**
+
+--
+<br>
+
+<div align="center">
+<img src="fov.PNG" height=150>
+</div>
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view (**T<sub>f**)
+2. Deployment operating times (**T<sub>o**)
+3. Area surveyed by the camera (**A<sub>f**)
+
+<br>
+
+$$Density = \frac{\sum(N~*~T_f)}{A_f~*~T_o}$$
+---
+class: hide-logo
+### Density (camera level)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.showtext=TRUE, out.width="90%", fig.height=5, dpi=600}
+
+# Species for which we have reasonable sample size for.
+species_of_interest <- c("White-tailed Deer", "Black Bear", "Moose", "Gray Wolf", "Bison", "Canada Lynx",
+                         "Coyote", "Red fox", "Snowshoe Hare")
+
+p4 <- df_fmm_density %>%
+  filter(common_name %in% species_of_interest) %>%
+  left_join(df_fmm_nimages, by = "common_name") %>%
+  mutate(common_name = fct_reorder(common_name, n, .desc = TRUE)) %>%
+  ggplot(mapping = aes(x = density, fill = common_name)) +
+  geom_histogram() +
+  scale_fill_viridis_d(direction = -1) +
+  labs(y = "Number of cameras", x = expression(Density~(individuals~per~km^2)),
+       title = "",
+       subtitle = "",
+       caption = "Note that the x-axis is scaled differently by species.") +
+  facet_wrap(~ common_name, scales = "free_x") +
+  theme_abmi() +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 10),panel.spacing.x = unit(1, "lines"),
+        panel.spacing.y = unit(1, "lines"),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank())
+
+p4
+
+```
+
+---
+### Density (camera level)
+
+- Highly skewed distribution at the camera level
+
+- Generally require high sample sizes to deal with outliers
+
+- When aggregating together to estimate a mean density, we use a simulation technique to assess the uncertainty of an estimate
+
+---
+class: hide-logo
+### Density (trapline level)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.showtext=TRUE, out.width="90%", fig.height=5, dpi=600}
+
+p5 <- df_fmm_density_trapline %>%
+  left_join(df_fmm_nimages, by = "common_name") %>%
+  mutate(trapline = factor(trapline, levels = c("Lloyd", "Destiny", "Frank")),
+         common_name = fct_reorder(common_name, n, .desc = TRUE)) %>%
+  ggplot(aes(x = trapline, 
+             y = density_avg, 
+             ymin = density_lci_0.9, 
+             ymax = density_uci_0.9, 
+             color = common_name)) +
+  geom_errorbar(width = 0.4, size = 1) +
+  geom_point(size = 4) +
+  coord_flip() +
+  facet_wrap(~ common_name, ncol = 3, scales = "free_x") +
+  scale_color_viridis_d(direction = -1) +
+  labs(x = "", y = expression(Density~(individuals~per~km^2)),
+       title = "",
+       subtitle = "",
+       caption = "Note that the x-axis is scaled differently by species. Error bars reflect a 90% confidence interval.\nFrank's trapline is the furthest north, and Lloyd's is the furthest south.") +
+  theme_abmi(font = "Montserrat") +
+  theme(panel.grid.major = element_blank(),
+        legend.position = "none",
+        strip.text = element_text(size = 10),
+        panel.spacing.x = unit(1, "lines"),
+        panel.spacing.y = unit(1, "lines"),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank())
+
+p5
+
+```
+
+---
+### Density (trapline level)
+
+Notes:
+
++ A trapline-level estimate is valid as long as the cameras are a *representative sample* of the area
+
++ White-tailed deer, and to a lesser extent coyote, are far more prevalent in the two traplines near Fort McMurray
+
++ Black bears, lynx, and gray wolves show the opposite pattern
+
++ Bison were only seen at Frank's trapline, with a high degree of uncertainty around the mean estimate
+
+---
+### Spatial Analysis
+
+For each camera point location, I summarised the following variables:
+
+1. **Distance to nearest major facility**
+
+  + 2018 ABMI Human Footprint industrials and mines sublayer.
+  + Includes features like processing plants, open pit mines (including gravel), airports, etc.
+  + Ranged from 70m to over 55km.
+  
+--
+
+2. **Proportion of human footprint disturbance in 1km buffer around the camera**
+
+  + Included forestry, energy, and transportation footprint.
+  + Ranged from 0 to 85%, with the majority (37/51) below 10%.
+  
+--
+
+I used data from the following species: **White-tailed deer**, **Moose**, **Black Bear**, and **Gray Wolf**.
+  
+---
+### Spatial Analysis
+
+I tested models with two different dependent variables:
+
+1. **Presence/Absence** - Do the zero records differ from the non-zero records?
+
+--
+
+2. **Abundance given presence** - Try to explain variation in abundance (ie density) when a species was recorded.
+
+---
+### Spatial Analysis - Results
+
+The only statistically significant effect found was that **white-tailed deer abundance increases as disturbance increases**. 
+
+No significant relationships were found in any of the other three species. This may be because:
+
+--
+
+1. There was a small sample of data.
+
+--
+
+2. How disturbance was defined.
+
+--
+
+3. There are other factors that weren't controlled for.
+
+---
+### Future Directions
+
+- Different encoding of explanatory variables related to disturbance
+
+- More data!
+
+- Study the effects of human activity along the trapline
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

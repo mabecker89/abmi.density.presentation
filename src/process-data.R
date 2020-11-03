@@ -60,6 +60,7 @@ anim_save("./docs/plot1.gif")
 
 library(readr)
 library(stringr)
+library(sf)
 
 cam_locations <- read_csv("S:/github-repos-data/SC-Camera-Mammals/data/lookup/camera-locations-public.csv")
 
@@ -154,6 +155,7 @@ ggplot(data = everything, aes(x = WMUNIT_NAM, y = density_avg,
   transition_states(projects)
 
 anim_save("./docs/plot2.gif")
+
 
 
 

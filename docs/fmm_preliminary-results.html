@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>McMurray Métis Camera Project</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marcus Becker" />
+    <meta name="date" content="2020-11-03" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# McMurray Métis Camera Project
+## 📷<br><em>Preliminary Results</em>
+### Marcus Becker
+### 2020-11-03
+
+---
+
+
+
+
+
+
+## Outline
+
+1. [Summary Stats](#summary)
+
+1. [Estimating Density](#density)
+
+1. [Spatial Analysis](#spatial)
+
+1. [Further Work](#moar)
+
+---
+class: center, middle
+name: summary
+
+# Summary Stats
+
+---
+class: hide-logo
+### Where were the cameras placed?
+
+&lt;iframe src="fmm_map1.html" width="800" height="500"&gt; &lt;/iframe&gt;
+
+---
+### Number of images by species
+
+&lt;img src="fmm_preliminary-results_files/figure-html/unnamed-chunk-1-1.png" width="90%" /&gt;
+
+---
+class: hide-logo
+### Number of images by species and trapline
+
+&lt;img src="fmm_preliminary-results_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+
+---
+class: center, middle
+name: density
+
+# Animal Density
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+--
+  
+Important components of the calculation:
+
+1. **Time in the camera field of view**.
+
+---
+### Density
+
+.pull-left[
+&lt;img src="moose1.gif" height=300 width=500&gt;
+]
+
+.pull-right[
+&lt;img src="plot1.gif" height=265 width=300&gt;
+]
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view.
+2. **Deployment operating times**
+
+---
+class: hide-logo
+### Density
+
+&lt;img src="fmm_preliminary-results_files/figure-html/durations-1.png" width="100%" /&gt;
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view.
+2. Deployment operating times
+3. **Area surveyed by the camera**
+
+--
+&lt;br&gt;
+
+&lt;div align="center"&gt;
+&lt;img src="fov.PNG" height=150&gt;
+&lt;/div&gt;
+
+---
+### Density
+
+We can use cameras to estimate the density of various species in a given area.
+
+  + Density = number of individuals per unit area.
+  + Each camera is a **sample** of the area we're interested in.
+  
+Important components of the calculation:
+
+1. Time in the camera field of view (**T&lt;sub&gt;f**)
+2. Deployment operating times (**T&lt;sub&gt;o**)
+3. Area surveyed by the camera (**A&lt;sub&gt;f**)
+
+&lt;br&gt;
+
+`$$Density = \frac{\sum(N~*~T_f)}{A_f~*~T_o}$$`
+---
+class: hide-logo
+### Density (camera level)
+
+&lt;img src="fmm_preliminary-results_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+
+---
+### Density (camera level)
+
+- Highly skewed distribution at the camera level
+
+- Generally require high sample sizes to deal with outliers
+
+- When aggregating together to estimate a mean density, we use a simulation technique to assess the uncertainty of an estimate
+
+---
+class: hide-logo
+### Density (trapline level)
+
+&lt;img src="fmm_preliminary-results_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+
+---
+### Density (trapline level)
+
+Notes:
+
++ A trapline-level estimate is valid as long as the cameras are a *representative sample* of the area
+
++ White-tailed deer, and to a lesser extent coyote, are far more prevalent in the two traplines near Fort McMurray
+
++ Black bears, lynx, and gray wolves show the opposite pattern
+
++ Bison were only seen at Frank's trapline, with a high degree of uncertainty around the mean estimate
+
+---
+### Spatial Analysis
+
+For each camera point location, I summarised the following variables:
+
+1. **Distance to nearest major facility**
+
+  + 2018 ABMI Human Footprint industrials and mines sublayer.
+  + Includes features like processing plants, open pit mines (including gravel), airports, etc.
+  + Ranged from 70m to over 55km.
+  
+--
+
+2. **Proportion of human footprint disturbance in 1km buffer around the camera**
+
+  + Included forestry, energy, and transportation footprint.
+  + Ranged from 0 to 85%, with the majority (37/51) below 10%.
+  
+--
+
+I used data from the following species: **White-tailed deer**, **Moose**, **Black Bear**, and **Gray Wolf**.
+  
+---
+### Spatial Analysis
+
+I tested models with two different dependent variables:
+
+1. **Presence/Absence** - Do the zero records differ from the non-zero records?
+
+--
+
+2. **Abundance given presence** - Try to explain variation in abundance (ie density) when a species was recorded.
+
+---
+### Spatial Analysis - Results
+
+The only statistically significant effect found was that **white-tailed deer abundance increases as disturbance increases**. 
+
+No significant relationships were found in any of the other three species. This may be because:
+
+--
+
+1. There was a small sample of data.
+
+--
+
+2. How disturbance was defined.
+
+--
+
+3. There are other factors that weren't controlled for.
+
+---
+### Future Directions
+
+- Different encoding of explanatory variables related to disturbance
+
+- More data!
+
+- Study the effects of human activity along the trapline
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(ABMI-notext.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 0em;
+  left: 2em;
+  width: 110px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
