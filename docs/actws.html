@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Monitoring Mammals in Alberta with Remote Cameras</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marcus Becker" />
+    <meta name="author" content="Alberta Biodiversity Monitoring Institute" />
+    <meta name="date" content="2020-12-16" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Monitoring Mammals in Alberta with Remote Cameras
+## 📷
+### Marcus Becker
+### Alberta Biodiversity Monitoring Institute
+### 2020-12-16
+
+---
+
+
+
+## Outline
+
+1. [Estimating Density](#density)
+
+1. [Assumptions and Limitations](#assume)
+
+1. [Use in Regional Monitoring](#monitor)
+
+1. [Testing Assumptions](#test)
+
+---
+class: center, middle
+name: density
+
+# Estimating Density
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+REST = &lt;ins&gt;**R**&lt;/ins&gt;andom &lt;ins&gt;**E**&lt;/ins&gt;ncounter &lt;ins&gt;**S**&lt;/ins&gt;taying &lt;ins&gt;**T**&lt;/ins&gt;ime
+
+--
+
+### Central Tenets:
+
+1. **Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.** 
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+.pull-left[
+&lt;img src="moose1.gif" height=300 width=500&gt;
+]
+
+.pull-right[
+&lt;img src="plot1.gif" height=265 width=300&gt;
+]
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. **Unlike quadrats, cameras do not survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.**
+
+--
+
+&lt;div align="center"&gt;
+&lt;img src="fov.PNG" height=150&gt;
+&lt;/div&gt;
+
+---
+
+## The ABMI uses (a version of) the REST model
+
+### Central Tenets:
+
+1. Images taken at discrete intervals are converted into a measure of continuous time, in order to calculate how long the animal was in the camera field of view.
+
+1. Unlike quadrats, cameras do survey a fixed area. We estimate an *effective detection distance* (EDD) for each combination of species, habitat type, and season.
+
+&lt;br&gt;
+
+`$$Density = \frac{\sum(N~*~T_f)}{A_f~*~T_0}$$`
+---
+
+### Resources
+
+--
+
+ABMI report:
+
+[Animal Density from Camera Data](https://abmi.ca/home/publications/501-550/516)
+
+--
+
+Code base:
+
+[github.com/ABbiodiversity/mammals-camera](https://github.com/ABbiodiversity/mammals-camera)
+
+--
+
+Notable literature:
+
++ Rowcliffe et al (2008)
+  - *Estimating Animal Density Using Camera Traps Without the Need for Individual Recognition*
+
++ Nakashima et al (2018) 
+  - *Estimating Animal Density Without Individual Recognition Using Information Exclusively Derived From Camera Traps*
+
+---
+
+## The Goal
+
++ We want to be able to report on differences in species abundance either between areas, or over time. 
+
+--
+
++ We want to use data collected from camera traps to make inferences about species' habitat associations.
+
+---
+
+## Important Assumptions
+
++ In order to estimate density in an area of interest, cameras are placed in a random systematic manner so that they are **surveying a representative sample** of the larger area.
+
+--
+
++ Animals are not attracted to or repelled by the cameras - i.e. do not change their behaviour because of the cameras. 
+
+--
+
++ Animals are certain to be detected within 5 metres of the camera.
+
+---
+class: center, middle
+name: monitor
+
+# Regional Monitoring
+
+---
+
+### Wildlife Management Units (WMUs)
+
+Here is a map of them in Alberta:
+
+--
+
+.pull-right[
+![](actws_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
+
+---
+
+### Wildlife Management Units (WMUs)
+
+Here is a map of them in Alberta:
+
+.pull-left[Let's pick out a subset:
+
++ Algar Lake (WMU 519)
++ Winefred Lake (WMU 517)
++ Crow Lake (WMU 512)
++ Heart Lake (WMU 515)
+]
+.pull-right[
+![](actws_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+]
+
+---
+class: hide-logo
+### Where are ABMI cameras? (...ish)
+
+
+
+&lt;iframe src="map1.html" width="800" height="500"&gt; &lt;/iframe&gt;
+
+---
+
+### (Relative) Density Estimates
+
+.left-code[
+
+```r
+library(abmi.camera.extras)
+
+cameras &lt;- ace_get_cam(
+  aoi = ab_wmu_selection,
+  group_id = WMUNIT_NAM,
+  crs = 4326)
+
+density &lt;- ace_join_dens(
+  x = cameras, 
+  species = c(
+    "Moose", "Black Bear"))
+```
+]
+
+.right-plot[
+&lt;img src="bear.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="moose.png" width="40%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+### (Relative) Density Estimates
+
+.left-code[
+
+```r
+library(abmi.camera.extras)
+
+cameras &lt;- ace_get_cam(
+  aoi = ab_wmu_selection,
+  group_id = WMUNIT_NAM,
+  crs = 4326)
+
+density &lt;- ace_join_dens(
+  x = cameras, 
+  species = c(
+    "Moose", "Black Bear"))
+```
+]
+
+
+
+.right-plot[
+![](actws_files/figure-html/plot-1.png)
+]
+
+---
+
+### (Relative) Regional Density
+
+.left-code[
+
+```r
+summary &lt;- 
+  ace_summarise_dens(
+  x = density,
+  group_id = WMUNIT_NAM,
+  conflevel = 0.9
+)
+```
+]
+
+
+
+.right-plot[
+![](actws_files/figure-html/plot1-1.png)
+]
+
+---
+class: center, middle
+name: CI
+
+# How does this compare to established monitoring methods?
+
+---
+class: center, middle
+name: moar
+
+# Aerial Surveys!
+
+---
+class: hide-logo
+# Methods comparison
+
+&lt;img src="actws_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: hide-logo
+# Methods comparison
+
+&lt;img src="actws_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle
+name: assume
+
+# Testing Assumptions
+
+---
+class: hide-logo
+### Are animals attracted to the camera / pole?
+
+--
+
+If so, can we quantify how this influences time in front of the camera?
+
+&lt;img src="C:/Users/mabec/Documents/R/abmi.density.presentation/docs/moose.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: hide-logo
+### Microhabitats
+
+Do animals preferentially select for openings in forested stands?
+
+--
+
+.pull-left[
+&lt;img src="open.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="closed.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Are animals reliably captured within 5 metres of the camera?
+
+.pull-left[
+&lt;img src="reindeer.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="fox.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+## Questions?
+
+&lt;br&gt;
+
+Feel free to email me anytime!
+
+[mabecker@ualberta.ca](mabecker@ualberta.ca)
+
+&lt;br&gt;
+
+## Thanks!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(ABMI-notext.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 0em;
+  left: 2em;
+  width: 110px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
