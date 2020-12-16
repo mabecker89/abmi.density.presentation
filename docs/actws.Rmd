@@ -405,7 +405,6 @@ name: moar
 # Aerial Surveys!
 
 ---
-class: hide-logo
 # Methods comparison
 
 ```{r echo=FALSE, out.width="80%", fig.height=5, fig.align="center", fig.showtext=TRUE, warning=FALSE, message=FALSE, dpi=600}
@@ -430,13 +429,12 @@ wmu_dens %>%
   theme_abmi() +
   labs(y = "Camera Density",
        x = "Aerial Density",
-       title = "Comparison of Estimated Moose Densities",
+       title = "Comparison of Estimated Moose WMU Densities",
        subtitle = "Monitoring conducted between 2014-2019.")
 
 ```
 
 ---
-class: hide-logo
 # Methods comparison
 
 ```{r echo=FALSE, out.width="80%", fig.height=5, fig.align="center", fig.showtext=TRUE, warning=FALSE, message=FALSE, dpi=600}
@@ -449,7 +447,7 @@ wmu_dens %>%
   theme_abmi() +
   labs(y = "Camera Density",
        x = "Aerial Density",
-       title = "Comparison of Estimated Moose Densities",
+       title = "Comparison of Estimated Moose WMU Densities",
        subtitle = "Monitoring conducted between 2014-2019.")
 
 ```
@@ -461,7 +459,6 @@ name: assume
 # Testing Assumptions
 
 ---
-class: hide-logo
 ### Are animals attracted to the camera / pole?
 
 --
@@ -470,12 +467,11 @@ If so, can we quantify how this influences time in front of the camera?
 
 ```{r echo=FALSE, fig.height=7, out.width="80%", fig.align="center", warning=FALSE, message=FALSE, dpi=600}
 
-knitr::include_graphics(here("docs/moose.jpg"))
+knitr::include_graphics("moose.jpg")
 
 ```
 
 ---
-class: hide-logo
 ### Microhabitats
 
 Do animals preferentially select for openings in forested stands?
